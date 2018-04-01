@@ -1,26 +1,5 @@
-<style> 
-#wrapper { 
-	width: 100%; 
-	overflow: hidden; 
-	display: flex; 
-	align-items: center; 
-	justify-content: center; 
-} 
-#left { 
-	width: 50%; 
-	border: 2px solid white;
-	float:left; 
-} 
-#right { 
-	width: 50%; 
-	border: 2px solid white;
-	float: right; 
-}
- </style>
-
-
 <img src="src/p_logo.png" align="center">
-Convert you image into a patch collage
+Convert your image into a patch collage
 
 # Preliminaries
 The script uses the following list of dependencies:
@@ -57,19 +36,20 @@ optional arguments:
 ```
 
 # Results
-<div id="wrapper" align="center">
-	<div id="left" align="center"><img src="src/panda.jpg"></div>
-	<div id="right" align="right"><img src="src/p_panda.png"></div>
+
+<div align="left">	
+	<img src="src/panda.jpg" width=45%>
+	<img src="src/p_panda.png" width=45%>
 </div>
 
-<div id="wrapper" align="center">
-	<div id="left" align="center"><img src="src/rick.jpg"></div>
-	<div id="right" align="right"><img src="src/p_rick.png"></div>
+<div align="left">	
+	<img src="src/rick.jpg" width=45%>
+	<img src="src/p_rick.png" width=45%>
 </div>
 
-<div id="wrapper" align="center">
-	<div id="left" align="center"><img src="src/tramp.jpg"></div>
-	<div id="right" align="right"><img src="src/p_tramp.png"></div>
+<div align="left">	
+	<img src="src/tramp.jpg" width=45%>
+	<img src="src/p_tramp.png" width=45%>
 </div>
 
 Thanks to [Ivan Sosnovik](https://github.com/ISosnovik) for help.
