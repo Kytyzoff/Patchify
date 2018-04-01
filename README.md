@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <style> 
 #wrapper { 
 	width: 100%; 
@@ -84,3 +85,6 @@ Thanks to [Ivan Sosnovik](https://github.com/ISosnovik) for help.
 
 
 
+=======
+# Patchify
+>>>>>>> 4fc1d2844f6ece1973e5b79e22e087856b30ab92
