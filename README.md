@@ -1,4 +1,3 @@
-
 <style> 
 #wrapper { 
 	width: 100%; 
@@ -84,5 +83,3 @@ Thanks to [Ivan Sosnovik](https://github.com/ISosnovik) for help.
 
 
 
-
-=======
