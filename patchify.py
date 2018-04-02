@@ -2,6 +2,8 @@ from __future__ import division, print_function
 
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
+import os
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -12,11 +14,10 @@ import numpy as np
 from tqdm import tqdm
 
 
-CIFAR10_PATH = 'cifar-100-python/train'
 
+def load_cifar_100():
+    path = os.path.join(os.getcwd(), 'cifar100')
 
-# Utility functions
-def load_cifar(path=CIFAR10_PATH):
     with open(path, 'rb') as fo:
         try:
             dict_ = pickle.load(fo, encoding='bytes')
@@ -27,7 +28,7 @@ def load_cifar(path=CIFAR10_PATH):
     return images 
 
 
-def give_best_image(patch, images):
+def give_best_image(patch, images, diversity):
     patch = patch.mean((0, 1))
     images_mean = images.mean((1, 2))
     # TODO: find better function
@@ -35,13 +36,13 @@ def give_best_image(patch, images):
     diff = diff.sum(-1)
 
     args = diff.argsort(-1)
-    args = args[:10]
+    args = args[:diversity]
     argmin = np.random.choice(args)
     best_image = images[argmin]
     return best_image
 
 
-def patchify(source_path, output_path, bank, scale, n_processes=None):
+def patchify(source_path, output_path, bank, scale=1, n_processes=None, diversity=10):
     n_images, bank_h, bank_w, _ = bank.shape
 
     # source load and resize
@@ -67,7 +68,7 @@ def patchify(source_path, output_path, bank, scale, n_processes=None):
 
 
     # process patches
-    process_func = partial(give_best_image, images=bank)
+    process_func = partial(give_best_image, images=bank, diversity=diversity)
 
     pool = ThreadPool(processes=n_processes)
     best_images = []
@@ -95,54 +96,58 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser()
 
-    parser.add_argument('--dataset', type=str, dest='dataset', 
-                        help='bank of images to be used', 
-                        required=False, default='cifar10')
+    parser.add_argument('--source', type=str, required=True, 
+                        help='Image to convert')
 
-    parser.add_argument('--source', type=str, dest='source', 
-                        help='image to convert', required=True)
+    parser.add_argument('--output', type=str, required=True, 
+                        help='Output file path')
 
-    parser.add_argument('--scale', type=float, dest='scale', 
-                        help='rescale factor', default=1.0)
+    parser.add_argument('--dataset', type=str, default='cifar100',
+                        help='Dataset of images to be used. Default '
+                             'is "cifar100".')
 
-    parser.add_argument('--output', type=str, dest='output', 
-                        help='output file path', required=True)
+    parser.add_argument('--scale', type=float, default=1.0, 
+                        help='Rescale factor. The size of the image '
+                             'will be `scale` times bigger than the '
+                             'original one. Default is "1".')
 
-    parser.add_argument('--processes', type=int, dest='processes', 
-                        help='number of threads to be utilized', 
-                        default=None)
+    parser.add_argument('--processes', type=int, default=None,
+                        help='Number of threads to be utilized. '
+                             'By default the maximum number of '
+                             'threads would be utilizaed.')
 
-    parser.add_argument('--num-images', type=int, dest='num_images', 
-                        help='number of images to use', 
-                        default=-1)
+    parser.add_argument('--num-images', type=int, default=None, 
+                        help='Number of images to use. The images '
+                             'will be chosen randomly from the '
+                             'provided dataset. By default all the '
+                             'images are used.')
+
+    parser.add_argument('--diversity', type=int, default=10,
+                        help='Number of the most related images from '
+                             'which the best will be chose randomly. '
+                             'Default is 10. If `diversity` is 1 then '
+                             'the most related image will always be '
+                             'chosen. The growth of `diversity` '
+                             'increases the "expressive power" of the '
+                             'resulting collage but degrades the '
+                             'approximation.')
 
     options = parser.parse_args()
 
-    if options.dataset == 'cifar10':
-        bank = load_cifar()[:options.num_images]
+    # load images
+    if options.dataset == 'cifar100':
+        bank = load_cifar_100()
     else:
         raise NotImplementedError('The implementation for other datasets is not provided')
+
+    if options.num_images:
+        indices = np.arange(len(bank))
+        indices = np.random.choice(indices, options.num_images, replace=False)
+        bank = bank[indices]
 
     patchify(source_path=options.source, 
              output_path=options.output, 
              bank=bank, 
              scale=options.scale,
-             n_processes=options.processes)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+             n_processes=options.processes, 
+             diversity=options.diversity)
