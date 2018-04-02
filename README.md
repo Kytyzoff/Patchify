@@ -1,4 +1,5 @@
 <img src="src/p_logo.png" align="center">
+
 **Convert your image into a patch collage**
 
 # Preliminaries
